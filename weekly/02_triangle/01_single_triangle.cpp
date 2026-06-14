@@ -24,16 +24,14 @@ const char* fragmentShaderSource = "#version 330 core\n"
 "out vec4 FragColor;\n"
 "void main()\n"
 "{\n"
-"   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+"   FragColor = vec4(0.2f, 0.9f, 0.6f, 1.0f);\n"
 "}\n\0";
 
 
-
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 600;
 int main()
 {
-	int w = 1920;
-	int h = 1080;
-
 	glfwInit(); // initialize GLFW
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // configure GLFW (openGL version 4.6 in this case)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
@@ -45,7 +43,7 @@ int main()
 	// returns a GLFWwindow object
 
 	GLFWwindow* window =
-		glfwCreateWindow(w, h, "LearnOpenGL", nullptr, nullptr);
+		glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "02 - TRIANGLE", nullptr, nullptr);
 
 	if (window == nullptr)
 	{
@@ -55,6 +53,10 @@ int main()
 	}
 	glfwMakeContextCurrent(window);
 
+	// register callback function for window resize
+	// other callbacks possible for e.g. joystic input, process error messages, etc
+	// register callbacks after creating the window and before initiating render loop.
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	// GLAD - manages function pointers for OpenGL
 	// need to initialize before calling any OpenGL funciton
@@ -68,16 +70,8 @@ int main()
 		<< glGetString(GL_VERSION)
 		<< std::endl;
 
-	// Finally we need to tell openGL the size of the rendering window
-	// first 2 vals set location of lower left corner of window
-	//
-	glViewport(0, 0, w, h);
-
-	// register callback function for window resize
-	// other callbacks possible for e.g. joystic input, process error messages, etc
-	// register callbacks after creating the window and before initiating render loop.
-	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
+	// ===== SHADER OBJECTS ======
+	// 
 	// create shader object with type vertex shader
 	unsigned int vertexShader;
 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -93,7 +87,7 @@ int main()
 	if (!vert_success)
 	{
 		glGetShaderInfoLog(vertexShader, 512, nullptr, vert_infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILE\n" << infoLog << std::endl;
+		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILE\n" << vert_infoLog << std::endl;
 	}
 
 	// FRAGMENT SHADER
@@ -137,14 +131,10 @@ int main()
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 
-	// link vertex attributes (which part of input data goes to which vertex attribute)
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
 
-
-
+	// ======= VERTEX DATA AND BUFFERS ======
 	// vertex input data
-	float vertices[] = {
+	float bigTriangle[] = {
 		-0.5f, -0.5f, 0.0f,
 		0.5f, -0.5f, 0.0f,
 		0.0f, 0.5f, 0.0f
@@ -157,14 +147,23 @@ int main()
 	// Bind the VBO
 	// makes the VBO the current buffer for vertex data ops
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+	// Vertex array object 
+	unsigned int VAO;
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+
 	// upload data - copies data from CPU to GPU mem
 	glBufferData(
 		GL_ARRAY_BUFFER,
-		sizeof(vertices),
-		vertices,
+		sizeof(bigTriangle),
+		bigTriangle,
 		GL_STATIC_DRAW
 	); // now the GPU has its own copy of the verts
 
+	// link vertex attributes (which part of input data goes to which vertex attribute)
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
 	
 
 
@@ -182,10 +181,21 @@ int main()
 		glClearColor(0.8f, 0.1f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
+
+		glUseProgram(shaderProgram);
+		//draw triangle with data in VAO
+		glBindVertexArray(VAO);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+
 		// check and call events and swap the buffers
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
+
+	// DE-ALLOCATION OF MEMORY
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
+	glDeleteProgram(shaderProgram);
 
 
 	// properly clean/delete GLFW's resources
