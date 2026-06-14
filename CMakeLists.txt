@@ -48,3 +48,13 @@ target_link_libraries(02_02_two_triangles_01
 	opengl32
 )
 
+add_executable(02_03_EBO_rectangle_01
+	weekly/02_triangle/03_EBO_rectangle_01.cpp
+)
+
+target_link_libraries(02_03_EBO_rectangle_01
+	PRIVATE
+	glfw
+	glad
+	opengl32
+)
