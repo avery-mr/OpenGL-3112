@@ -26,33 +26,44 @@ target_link_libraries(01_environment_setup
 	opengl32
 )
 
-add_executable(02_01_single_triangle
+add_executable(0201_single_triangle
 	weekly/02_triangle/01_single_triangle.cpp
  )
 
-target_link_libraries(02_01_single_triangle
+target_link_libraries(0201_single_triangle
 	PRIVATE
 	glfw
 	glad
 	opengl32
 )
 
-add_executable(02_02_two_triangles_01
-	weekly/02_triangle/02_two_triangles_01.cpp
+add_executable(0202_two_triangles_singleVBO
+	"weekly/02_triangle/02_two_triangles_singleVBO.cpp"
 )
 
-target_link_libraries(02_02_two_triangles_01
+target_link_libraries(0202_two_triangles_singleVBO
 	PRIVATE
 	glfw
 	glad
 	opengl32
 )
 
-add_executable(02_03_EBO_rectangle_01
-	weekly/02_triangle/03_EBO_rectangle_01.cpp
+add_executable(0203_two_triangles_multipleVBOs
+	"weekly/02_triangle/03_two_triangles_multipleVBOs.cpp"
 )
 
-target_link_libraries(02_03_EBO_rectangle_01
+target_link_libraries(0203_two_triangles_multipleVBOs
+	PRIVATE
+	glfw
+	glad
+	opengl32
+)
+
+add_executable(0204_EBO_rectangle_01
+	"weekly/02_triangle/04_EBO_rectangle_01.cpp"
+)
+
+target_link_libraries(0204_EBO_rectangle_01
 	PRIVATE
 	glfw
 	glad

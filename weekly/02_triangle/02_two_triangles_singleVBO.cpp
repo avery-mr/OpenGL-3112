@@ -43,7 +43,7 @@ int main()
 	// returns a GLFWwindow object
 
 	GLFWwindow* window =
-		glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "02_03 - EBO RECTANGLE", nullptr, nullptr);
+		glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "02_02 - TWO TRIANGLES", nullptr, nullptr);
 
 	if (window == nullptr)
 	{
@@ -133,43 +133,31 @@ int main()
 
 
 	// ======= VERTEX DATA AND BUFFERS ======
-	// to draw a rectangle we can use two triangles, but that would require 6 verts when only 4 are needed (two pairs overlapping)
-	// - USE EBO (element buffer object) as separate buffer to store indices that should be drawn
+	// vertex input data
 	float vertices[] = {
-		0.5f, 0.5f, 0.0f, // top right
-		0.5f, -0.5f, 0.0f, // bottom right
-		-0.5f, -0.5f, 0.0f, // bottom left
-		-0.5f, 0.5f, 0.0f // top left
+		-0.9f, -0.5f, 0.0f,
+		-0.1f, -0.5f, 0.0f,
+		-0.5f, 0.5f, 0.0f,
+		0.9f, -0.5f, 0.0f,
+		0.1f, -0.5f, 0.0f,
+		0.5f, 0.5f, 0.0f
 	};
 
-	unsigned int indices[] = {
-		0, 1, 3, // first triangle
-		1, 2, 3 // second triangele
-	};
 
+	// create multiple VBOs and VAOs at the same time
 	unsigned int VBO, VAO;
 	glGenBuffers(1, &VBO);
 	glGenVertexArrays(1, &VAO);
 
-	// generate single EBO
-	unsigned int EBO;
-	glGenBuffers(1, &EBO);
-
-	// bind vertex array object
+	// triangle1 setup
 	glBindVertexArray(VAO);
-	// copy vertices array in a vertex buffer for OpenGL to use
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	// copy our index array in a element buffer for OpenGL to use
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-	// then set the vertex attribute pointers
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	// render wireframe OR shaded (default)
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // WIREFRAME
-	// glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // FILL/SHADED
+	
+
 
 
 	// while loop keeps the window open, swapping back and forth between buffers
@@ -187,9 +175,11 @@ int main()
 
 
 		glUseProgram(shaderProgram);
-		
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		// draw triangles with data from VAO
+		glBindVertexArray(VAO);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+
 
 		// check and call events and swap the buffers
 		glfwSwapBuffers(window);
@@ -199,7 +189,6 @@ int main()
 	// DE-ALLOCATION OF MEMORY
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
-	glDeleteBuffers(1, &EBO);
 	glDeleteProgram(shaderProgram);
 
 
