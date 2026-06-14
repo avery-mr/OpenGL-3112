@@ -26,13 +26,25 @@ target_link_libraries(01_environment_setup
 	opengl32
 )
 
-add_executable(02_single_triangle
-	"weekly/02_triangle/01_single_triangle.cpp"
+add_executable(02_01_single_triangle
+	weekly/02_triangle/01_single_triangle.cpp
  )
 
-target_link_libraries(02_single_triangle
+target_link_libraries(02_01_single_triangle
 	PRIVATE
 	glfw
 	glad
 	opengl32
 )
+
+add_executable(02_02_two_triangles_01
+	weekly/02_triangle/02_two_triangles_01.cpp
+)
+
+target_link_libraries(02_02_two_triangles_01
+	PRIVATE
+	glfw
+	glad
+	opengl32
+)
+
