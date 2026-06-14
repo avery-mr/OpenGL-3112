@@ -15,7 +15,7 @@ int main()
 	int h = 1080;
 
 	glfwInit(); // initialize GLFW
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // configure GLFW (openGL version 3.3 in this case)
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // configure GLFW (openGL version 4.6 in this case)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
@@ -25,9 +25,9 @@ int main()
 	// returns a GLFWwindow object
 
 	GLFWwindow* window =
-		glfwCreateWindow(w, h, "LearnOpenGL", nullptr, nullptr);  
+		glfwCreateWindow(w, h, "OpenGL 3112", nullptr, nullptr);  
 
-	if (window == NULL)
+	if (window == nullptr)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
@@ -44,6 +44,9 @@ int main()
 		return -1;
 	}
 
+	std::cout << "OpenGL Version: "
+		<< glGetString(GL_VERSION)
+		<< std::endl;
 
 	// Finally we need to tell openGL the size of the rendering window
 	// first 2 vals set location of lower left corner of window

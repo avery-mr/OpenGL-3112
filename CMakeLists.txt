@@ -10,16 +10,27 @@ add_library(glad
 	external/glad/src/glad.c
 )
 
-add_executable(01_window
-	src/01_window/main.cpp
-)
-
 target_include_directories(glad
 	PUBLIC 
 	external/glad/include 
 )
 
-target_link_libraries(01_window
+add_executable(01_environment_setup
+	weekly/01_environment_setup/main.cpp
+)
+
+target_link_libraries(01_environment_setup
+	PRIVATE
+	glfw
+	glad
+	opengl32
+)
+
+add_executable(02_triangle
+	weekly/02_triangle/main.cpp
+)
+
+target_link_libraries(02_triangle
 	PRIVATE
 	glfw
 	glad
