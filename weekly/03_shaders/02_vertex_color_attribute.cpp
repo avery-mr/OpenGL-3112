@@ -14,27 +14,28 @@ void processInput(GLFWwindow* window);
 // data and forwarding it to the shader's output.
 // In real applications the inpput data is usually not already normalized.
 
+
+// we now have a location for vertex pos and a location for vertex color
 const char* vertexShaderSource = "#version 460 core\n"
-	"layout (location = 0) in vec3 aPos;\n"
-	"void main()\n"
-	"{\n"
-	"	gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-	"}\0";
+"layout (location = 0) in vec3 aPos;\n" // position variable has attribute position 0
+"layout (location = 1) in vec3 aColor;\n" // color variable has attribute position 1
+
+"out vec3 ourColor;\n" // output a color to the fragment shader
+"void main()\n"
+"{\n"
+"   vec3 newPos = aPos * -1.0f;\n" // we can also do some transformations here, e.g. scaling the position by -1 to flip the triangle
+"	gl_Position = vec4(newPos, 1.0);\n"
+"	ourColor = aColor;\n" // set ourColor to the input color we got from the vertex data
+"}\0";
 
 const char* fragmentShaderSource = "#version 330 core\n"
 "out vec4 FragColor;\n"
+"in vec3 ourColor;\n" // input color from vertex shader (same name and same type)
 "void main()\n"
 "{\n"
-"   FragColor = vec4(0.2f, 0.9f, 0.6f, 1.0f);\n"
+"   FragColor = vec4(ourColor, 1.0);\n"
 "}\n\0";
 
-const char* frag_uniform_example_01 = "#version 460 core\n"
-"out vec4 FragColor;\n"
-"uniform vec4 ourColor;\n"
-"void main()\n"
-"{\n"
-"   FragColor = ourColor;\n"
-"}\n\0";
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
@@ -102,7 +103,7 @@ int main()
 	// calculates color output of pixels
 	unsigned int fragmentShader;
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &frag_uniform_example_01, nullptr);
+	glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
 	glCompileShader(fragmentShader);
 
 	// CHECK IF FRAGMENT SHADER IS COMPILE CORRECTLY
@@ -143,10 +144,11 @@ int main()
 
 	// ======= VERTEX DATA AND BUFFERS ======
 	// vertex input data
-	float bigTriangle[] = {
-		-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f,
-		0.0f, 0.5f, 0.0f
+	float vertices[] = {
+		// positions         // colors
+		-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
+		 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // bottom right
+		 0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f  // top
 	};
 
 	// create Vertex Buffer Object
@@ -165,15 +167,17 @@ int main()
 	// upload data - copies data from CPU to GPU mem
 	glBufferData(
 		GL_ARRAY_BUFFER,
-		sizeof(bigTriangle),
-		bigTriangle,
+		sizeof(vertices),
+		vertices,
 		GL_STATIC_DRAW
 	); // now the GPU has its own copy of the verts
 
 	// link vertex attributes (which part of input data goes to which vertex attribute)
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	
+
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
 
 
@@ -181,7 +185,7 @@ int main()
 	// continues until explicitely told to stop. without this a single frame would flass and then quit and close.
 	// glfwWindowShouldClose checks at the start of each loop for instructions to close
 	// glfwPollEvents checks if events are triggerd (e.g. keyboard input)
-	while(!glfwWindowShouldClose(window))
+	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window); // looking for specific ESC key presses
 
@@ -190,23 +194,8 @@ int main()
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-
-		// ===========================================
-
-		double timeValue = glfwGetTime();
-		float redValue = abs(sin(timeValue));
-		float greenValue = abs(cos(timeValue));
-
-		// query the location of the uniform variable in the shader program
-		// note that this can be done before the rendering loop ?
-		int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-
 		glUseProgram(shaderProgram);
 
-		// set uniform value - updating a uniform requires you call glUseProgram first
-		glUniform4f(vertexColorLocation, redValue, greenValue, 0.0f, 1.0f);
-
-		// ===========================================
 		//draw triangle with data in VAO
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);

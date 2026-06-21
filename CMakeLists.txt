@@ -69,4 +69,9 @@ add_demo(
 	03_shaders/01_shaders_start.cpp
 )
 
+add_demo(
+	0302_vertex_color_attribute 
+	03_shaders/02_vertex_color_attribute.cpp
+)
+
 
