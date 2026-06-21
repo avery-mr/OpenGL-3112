@@ -74,4 +74,7 @@ add_demo(
 	03_shaders/02_vertex_color_attribute.cpp
 )
 
-
+add_demo(
+	0303_vertex_color_with_uniform_time
+	03_shaders/03_vertex_color_attribute_uniformTime.cpp
+)
