@@ -30,6 +30,11 @@ endfunction()
 
 # -------- ADD DEMOS ---------------
 add_demo(
+	scratch
+	scratch/scratch1.cpp
+)
+
+add_demo(
 	0101_Render_Window
 	01_environment_setup/01_render_window.cpp
 )
@@ -57,6 +62,11 @@ add_demo(
 add_demo(
 	0205_two_triangles_multiple_shaders
 	02_triangle/05_two_triangles_multiple_shaders.cpp
+)
+
+add_demo(
+	0301_shaders_start 
+	03_shaders/01_shaders_start.cpp
 )
 
 
