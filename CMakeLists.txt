@@ -20,6 +20,11 @@ function(add_demo TARGET_NAME SOURCE_FILE)
 		weekly/${SOURCE_FILE}
 	)
 
+	target_include_directories(${TARGET_NAME}
+		PRIVATE
+		${CMAKE_SOURCE_DIR}/include
+	)
+
 	target_link_libraries(${TARGET_NAME}
 		PRIVATE
 		glfw
@@ -82,4 +87,9 @@ add_demo(
 add_demo(
 	0304_vertex_shader_translate_01
 	03_shaders/04_vertex_shader_translate_01.cpp
+)
+
+add_demo(
+	0305_shader_class_test
+	03_shaders/05_shader_class_test.cpp
 )
