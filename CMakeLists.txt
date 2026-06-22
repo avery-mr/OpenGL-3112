@@ -78,3 +78,8 @@ add_demo(
 	0303_vertex_color_with_uniform_time
 	03_shaders/03_vertex_color_attribute_uniformTime.cpp
 )
+
+add_demo(
+	0304_vertex_shader_translate_01
+	03_shaders/04_vertex_shader_translate_01.cpp
+)

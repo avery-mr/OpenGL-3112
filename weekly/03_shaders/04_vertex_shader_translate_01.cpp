@@ -14,23 +14,20 @@ const char* vertexShaderSource = "#version 460 core\n"
 "layout (location = 1) in vec3 aColor;\n" // color variable has attribute position 1
 
 "out vec3 ourColor;\n" // output a color to the fragment shader
+"uniform vec3 uOffset;\n" // uniform variable for offset
 "void main()\n"
 "{\n"
-"   vec3 newPos = aPos * -1.0f;\n" // we can also do some transformations here, e.g. scaling the position by -1 to flip the triangle
+"   vec3 newPos = aPos + uOffset;\n"
 "	gl_Position = vec4(newPos, 1.0);\n"
 "	ourColor = aColor;\n" // set ourColor to the input color we got from the vertex data
 "}\0";
 
 const char* fragmentShaderSource = "#version 460 core\n"
 "out vec4 FragColor;\n"
-"uniform float uTime;\n"
 "in vec3 ourColor;\n" // input color from vertex shader (same name and same type)
 "void main()\n"
 "{\n"
-"   float t = (sin(uTime) + 0.5) + 0.5;\n"
-"   vec3 shiftedColor = ourColor.gbr;\n"
-"   vec3 finalColor = mix(ourColor, shiftedColor, t);\n"
-"   FragColor = vec4(finalColor, 1.0);\n"
+"   FragColor = vec4(ourColor, 1.0);\n"
 "}\n\0";
 
 
@@ -123,7 +120,7 @@ int main()
 	glAttachShader(shaderProgram, fragmentShader);
 	glLinkProgram(shaderProgram);
 
-	int timeLocation = glGetUniformLocation(shaderProgram, "uTime");
+	int offsetLocation = glGetUniformLocation(shaderProgram, "uOffset");
 
 	int shaderProgram_success;
 	char shaderProgram_infoLog[512];
@@ -145,9 +142,9 @@ int main()
 	// vertex input data
 	float vertices[] = {
 		// positions         // colors
-		-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
-		 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // bottom right
-		 0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f  // top
+		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, // bottom left
+		 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, // bottom right
+		 0.0f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f  // top
 	};
 
 	// create Vertex Buffer Object
@@ -194,14 +191,16 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glUseProgram(shaderProgram);
-		glUniform1f(timeLocation, glfwGetTime());
 
-		glUseProgram(shaderProgram);
+		float time = glfwGetTime();
+		// send translation to uniforms
+		glUniform3f(offsetLocation,
+			sin(time) * 0.5f, 0.0f, 0.0f);
 
 		//draw triangle with data in VAO
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
-
+		
 		// check and call events and swap the buffers
 		glfwSwapBuffers(window);
 		glfwPollEvents();
