@@ -93,3 +93,13 @@ add_demo(
 	0305_shader_class_test
 	03_shaders/05_shader_class_test.cpp
 )
+
+add_demo(
+	0306_vert_pos_to_color
+	03_shaders/06_vert_pos_to_color.cpp
+)
+
+add_demo(
+	0307_pulsing_bouncing_example
+	03_shaders/07_pulsing_bouncing_example.cpp
+)
