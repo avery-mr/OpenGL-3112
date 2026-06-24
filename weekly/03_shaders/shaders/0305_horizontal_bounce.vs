@@ -8,7 +8,7 @@ uniform float uTime;
 out vec3 ourColor;
 void main()
 {
-	vec3 newPos = (aPos.x + sin(uTime) * 0.5, aPos.y, aPos.z);
+	vec3 newPos = vec3(aPos.x + sin(uTime) * 0.5, aPos.y, aPos.z);
 	gl_Position = vec4(newPos, 1.0);
 	ourColor = aColor;
 }

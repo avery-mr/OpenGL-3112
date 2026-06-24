@@ -28,7 +28,7 @@ int main()
 	// returns a GLFWwindow object
 
 	GLFWwindow* window =
-		glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "02 - TRIANGLE", nullptr, nullptr);
+		glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "03 - SHADERS", nullptr, nullptr);
 
 	if (window == nullptr)
 	{
@@ -111,8 +111,10 @@ int main()
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		float t = (float)glfwGetTime();
+
 		ourShader.use(); // use the shader program we created	
-		ourShader.setFloat("uTime", (float)glfwGetTime()); // set the uniform uTime in the shader to the current time
+		ourShader.setFloat("uTime", t); // set the uniform uTime in the shader to the current time
 
 		//draw triangle with data in VAO
 		glBindVertexArray(VAO);

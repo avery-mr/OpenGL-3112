@@ -51,7 +51,7 @@ int main()
 	// returns a GLFWwindow object
 
 	GLFWwindow* window =
-		glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "02 - TRIANGLE", nullptr, nullptr);
+		glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "03 - SHADERS", nullptr, nullptr);
 
 	if (window == nullptr)
 	{
