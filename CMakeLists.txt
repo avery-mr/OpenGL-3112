@@ -103,3 +103,8 @@ add_demo(
 	0307_pulsing_bouncing_example
 	03_shaders/07_pulsing_bouncing_example.cpp
 )
+
+add_demo(
+	0401_test
+	04_transformations/01_test.cpp
+)

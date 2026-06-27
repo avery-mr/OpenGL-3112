@@ -60,8 +60,8 @@ int main()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// create shader program from class
-	Shader ourShader("../../../weekly/03_shaders/shaders/shader_verticalBounce.vs", 
-					 "../../../weekly/03_shaders/shaders/shader_pulsingRed.fs");
+	Shader ourShader("../../../weekly/03_shaders/shaders/shader_vertical_bounce.vs", 
+					 "../../../weekly/03_shaders/shaders/shader_simple_Red.fs");
 
 	// ======= VERTEX DATA AND BUFFERS ======
 	// vertex input data
