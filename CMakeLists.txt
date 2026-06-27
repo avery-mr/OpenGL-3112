@@ -105,6 +105,6 @@ add_demo(
 )
 
 add_demo(
-	0401_test
-	04_transformations/01_test.cpp
+	0401_transform_matrix_01
+	04_transformations/01_transform_matrix_01.cpp
 )
