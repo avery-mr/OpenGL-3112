@@ -4,10 +4,6 @@
 #include <Shader.h>
 #include <filesystem>
 
-//glm
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 // callback for resizing viewer window
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -64,8 +60,8 @@ int main()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// create shader program from class
-	Shader ourShader("../../../shaders/utility/xform_simple.vs", 
-					 "../../../shaders/utility/vertex_color.fs");
+	Shader ourShader("../../../weekly/03_shaders/shaders/0305_shader.vs", 
+					 "../../../weekly/03_shaders/shaders/0308_mouse_pos_to_color.fs");
 
 	// ======= VERTEX DATA AND BUFFERS ======
 	// vertex input data
@@ -75,12 +71,6 @@ int main()
 		 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, // bottom right
 		 0.0f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f  // top
 	};
-
-	// create Transformations
-	glm::mat4 trans = glm::mat4(1.0f); // initialize identity matrix
-	trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0)); // rotate on z axis
-	trans = glm::scale(trans, glm::vec3(0.6f, 1.5f, 0.5f)); // uniform scale to .5
-
 
 	// create Vertex Buffer Object
 	// used to copy vertex data into GPU memory
@@ -127,9 +117,27 @@ int main()
 
 		ourShader.use();
 
+		double mouseX, mouseY;
+		glfwGetCursorPos(window, &mouseX, &mouseY);
+		//std::cout << mouseX << ", " << mouseY << std::endl;
 
-		//send tranform to shader
-		ourShader.setMat4("transform", trans);
+		int width, height;
+		glfwGetWindowSize(window, &width, &height);
+
+		if (mouseX >= 0 && mouseX <= width &&
+			mouseY >= 0 && mouseY <= height)
+		{
+			float normalizedX = static_cast<float>(mouseX / width);
+			float normalizedY = static_cast<float>(mouseY / height);
+
+			ourShader.setFloat("mX", normalizedX);
+			ourShader.setFloat("mY", normalizedY);
+
+		}
+
+		
+
+
 
 
 		//draw triangle with data in VAO

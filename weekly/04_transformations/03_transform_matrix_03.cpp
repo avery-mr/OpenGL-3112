@@ -71,37 +71,49 @@ int main()
 	// vertex input data
 	float vertices[] = {
 		// positions         // colors
-		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, // bottom left
-		 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, // bottom right
-		 0.0f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f  // top
+		-0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // 0
+		-0.5f,  0.0f, 0.0f, 1.0f, 1.0f, 1.0f, // 1
+		-0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // 2
+		 0.0f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // 3
+		 0.0f,  0.0f, 0.0f, 1.0f, 1.0f, 1.0f, // 4
+		 0.0f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // 5
+		 0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // 6
+		 0.5f,  0.0f, 0.0f, 1.0f, 1.0f, 1.0f, // 7 
+		 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f  // 8
 	};
 
-	// create Transformations
-	glm::mat4 trans = glm::mat4(1.0f); // initialize identity matrix
-	trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0)); // rotate on z axis
-	trans = glm::scale(trans, glm::vec3(0.6f, 1.5f, 0.5f)); // uniform scale to .5
+	unsigned int indices[] = {
+		0, 1, 3,
+		1, 2, 5,
+		3, 6, 7,
+		5, 7, 8,
+		1,4,5,
+		1, 3, 4,
+		3, 4, 7, 
+		4, 7, 5
+	};
+	
+	unsigned int VBO, VAO, EBO;
+	glGenBuffers(1, &VBO);
+	glGenBuffers(1, &EBO);
 
-
-	// create Vertex Buffer Object
-	// used to copy vertex data into GPU memory
-	unsigned int VBO;
-	glGenBuffers(1, &VBO); // openGL creates an ID for a buffer
-	// Bind the VBO
-	// makes the VBO the current buffer for vertex data ops
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-	// Vertex array object 
-	unsigned int VAO;
 	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
 
-	// upload data - copies data from CPU to GPU mem
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(
 		GL_ARRAY_BUFFER,
 		sizeof(vertices),
 		vertices,
 		GL_STATIC_DRAW
-	); // now the GPU has its own copy of the verts
+	);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(
+		GL_ELEMENT_ARRAY_BUFFER,
+		sizeof(indices),
+		indices,
+		GL_STATIC_DRAW);
 
 	// link vertex attributes (which part of input data goes to which vertex attribute)
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
@@ -109,8 +121,6 @@ int main()
 
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
-
-
 
 	// while loop keeps the window open, swapping back and forth between buffers
 	// continues until explicitely told to stop. without this a single frame would flass and then quit and close.
@@ -125,16 +135,19 @@ int main()
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		float time = glfwGetTime();
+
 		ourShader.use();
-
-
-		//send tranform to shader
-		ourShader.setMat4("transform", trans);
-
-
-		//draw triangle with data in VAO
 		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+
+		// create Transformations model 1
+		glm::mat4 model1 = glm::mat4(1.0f); // initialize identity matrix
+		//model1 = glm::translate(model1, glm::vec3(0.5f, 0.5f, 0.0f));
+		model1 = glm::rotate(model1, 2.0f * time, glm::vec3(0.0f, 0.0f, 1.0f)); // rotate on z axis
+		//model1 = glm::scale(model1, glm::vec3(0.5f, 0.5f, 0.5f));
+
+		ourShader.setMat4("transform", model1);
+		glDrawElements(GL_TRIANGLES, 24, GL_UNSIGNED_INT, 0);
 		
 		// check and call events and swap the buffers
 		glfwSwapBuffers(window);
@@ -144,6 +157,8 @@ int main()
 	// DE-ALLOCATION OF MEMORY
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &EBO);
+
 
 
 

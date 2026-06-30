@@ -105,6 +105,22 @@ add_demo(
 )
 
 add_demo(
+	0308_mouse_position_uniform
+	03_shaders/08_mouse_position_uniform_test.cpp
+)
+
+
+add_demo(
 	0401_transform_matrix_01
 	04_transformations/01_transform_matrix_01.cpp
+)
+
+add_demo(
+	0402_transform_matrix_02
+	04_transformations/02_transform_matrix_02.cpp
+)
+
+add_demo(
+	0403_transform_matrix_03
+	04_transformations/03_transform_matrix_03.cpp
 )
