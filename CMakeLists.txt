@@ -6,8 +6,19 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_subdirectory(external/glfw)
+
+add_library(common
+	src/stb_image.cpp
+)
+
 add_library(glad
 	external/glad/src/glad.c
+)
+
+target_include_directories(common
+	PUBLIC 
+	${CMAKE_SOURCE_DIR}/include
+	${CMAKE_SOURCE_DIR}/external/stb
 )
 
 target_include_directories(glad
@@ -15,21 +26,21 @@ target_include_directories(glad
 	external/glad/include 
 )
 
+target_link_libraries(common
+	PUBLIC 
+	glfw
+	glad
+	opengl32
+)
+
 function(add_demo TARGET_NAME SOURCE_FILE)
 	add_executable(${TARGET_NAME}
 		weekly/${SOURCE_FILE}
 	)
 
-	target_include_directories(${TARGET_NAME}
-		PRIVATE
-		${CMAKE_SOURCE_DIR}/include
-	)
-
 	target_link_libraries(${TARGET_NAME}
 		PRIVATE
-		glfw
-		glad
-		opengl32
+		common
 	)
 endfunction()
 
@@ -123,4 +134,9 @@ add_demo(
 add_demo(
 	0403_transform_matrix_03
 	04_transformations/03_transform_matrix_03.cpp
+)
+
+add_demo(
+	0501_texture_start
+	05_textures/01_texture_start.cpp
 )
