@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 #include <Shader.h>
 #include <filesystem>
+#include <stb_image.h>
 
 //glm
 #include <glm/glm.hpp>
@@ -64,35 +65,24 @@ int main()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// create shader program from class
-	Shader ourShader("../../../assets/shaders/utility/xform_simple.vs", 
-					 "../../../assets/shaders/utility/vertex_color.fs");
+	Shader ourShader("../../../assets/shaders/utility/texture_simple.vs", 
+					 "../../../assets/shaders/utility/texture_vertColor_blend.fs");
 
 	// ======= VERTEX DATA AND BUFFERS ======
 	// vertex input data
 	float vertices[] = {
-		// positions         // colors
-		-0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // 0
-		-0.5f,  0.0f, 0.0f, 1.0f, 1.0f, 1.0f, // 1
-		-0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // 2
-		 0.0f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // 3
-		 0.0f,  0.0f, 0.0f, 1.0f, 1.0f, 1.0f, // 4
-		 0.0f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // 5
-		 0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // 6
-		 0.5f,  0.0f, 0.0f, 1.0f, 1.0f, 1.0f, // 7 
-		 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f  // 8
+		// positions          // colors           // texture coords
+		 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+		 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
 	};
 
 	unsigned int indices[] = {
 		0, 1, 3,
-		1, 2, 5,
-		3, 6, 7,
-		5, 7, 8,
-		1,4,5,
-		1, 3, 4,
-		3, 4, 7, 
-		4, 7, 5
+		1, 2, 3
 	};
-	
+
 	unsigned int VBO, VAO, EBO;
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
@@ -116,16 +106,55 @@ int main()
 		GL_STATIC_DRAW);
 
 	// link vertex attributes (which part of input data goes to which vertex attribute)
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
-	// while loop keeps the window open, swapping back and forth between buffers
-	// continues until explicitely told to stop. without this a single frame would flass and then quit and close.
-	// glfwWindowShouldClose checks at the start of each loop for instructions to close
-	// glfwPollEvents checks if events are triggerd (e.g. keyboard input)
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+	// ----- TEXTURES ---------
+
+	// gen texture id
+	unsigned int texture;
+	glGenTextures(1, &texture);  // takes how many textures we want to generate, stores them in an int array
+	glBindTexture(GL_TEXTURE_2D, texture); // bind the texture to the GL_TEXTURE_2D target
+
+	// set the texture wrapping parameters and filtering parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); // repeat in x direction
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); // repeat in y direction
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // minification filter
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // magnification filter
+	
+	// load IMAGE with stbi and generate texture
+	int width, height, nrChannels;
+	unsigned char* data = stbi_load("../../../assets/textures/248-pin.jpg", &width, &height, &nrChannels, 0);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		// - TEXTURE TARGET: GL_TEXTURE_2D (2D texture)
+		// - MIPMAP LEVEL: 0 (base level)
+		// - INTERNAL FORMAT: GL_RGB (how OpenGL should store the texture)
+		// - WIDTH: width of the texture
+		// - HEIGHT: height of the texture
+		// - BORDER: 0 (must be 0)
+		// - FORMAT: GL_RGB (format of the pixel data)
+		// - TYPE: GL_UNSIGNED_BYTE (data type of the pixel data)
+		// - DATA: pointer to the image data
+
+		glGenerateMipmap(GL_TEXTURE_2D); // AUTOMATICALLY GENERATE ALL REQUIRED MIPMAPS
+	}
+	else
+	{
+		std::cout << "Failed to load texture" << std::endl;
+	}
+
+	// free image data after generating texture
+	stbi_image_free(data);
+
+	// render loop
+	// -----------
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window); // looking for specific ESC key presses
@@ -135,21 +164,12 @@ int main()
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		float time = glfwGetTime();
+		glBindTexture(GL_TEXTURE_2D, texture); // bind the texture to the GL_TEXTURE_2D target
 
 		ourShader.use();
 		glBindVertexArray(VAO);
-
-		// create Transformations model 1
-		glm::mat4 model1 = glm::mat4(1.0f); // initialize identity matrix
-		//model1 = glm::translate(model1, glm::vec3(0.5f, 0.5f, 0.0f));
-		model1 = glm::rotate(model1, 2.0f * time, glm::vec3(0.0f, 0.0f, 1.0f)); // rotate on z axis
-		//model1 = glm::scale(model1, glm::vec3(0.5f, 0.5f, 0.5f));
-
-		ourShader.setMat4("transform", model1);
-		glDrawElements(GL_TRIANGLES, 24, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		
-		// check and call events and swap the buffers
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}

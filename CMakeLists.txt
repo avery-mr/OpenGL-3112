@@ -142,6 +142,16 @@ add_demo(
 )
 
 add_demo(
+	0502_texture_vertColor_blend
+	05_textures/02_texture_vertColor_blend.cpp
+)
+
+add_demo(
+	0503_texture_vertColor_alpha
+	05_textures/03_texture_vertColor_alpha.cpp
+)
+
+add_demo(
 	0601_coordinate_systems_start
 	06_coordinate_systems/01_coordSys_start.cpp
 )

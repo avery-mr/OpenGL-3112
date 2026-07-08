@@ -64,8 +64,8 @@ int main()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// create shader program from class
-	Shader ourShader("../../../shaders/utility/xform_simple.vs", 
-					 "../../../shaders/utility/vertex_color.fs");
+	Shader ourShader("../../../assets/shaders/utility/xform_simple.vs", 
+					 "../../../assets/shaders/utility/vertex_color.fs");
 
 	// ======= VERTEX DATA AND BUFFERS ======
 	// vertex input data
