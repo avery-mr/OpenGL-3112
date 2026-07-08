@@ -65,8 +65,8 @@ int main()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// create shader program from class
-	Shader ourShader("../../../assets/shaders/utility/texture_simple.vs", 
-					 "../../../assets/shaders/utility/texture_simple.fs");
+	Shader ourShader("../../../assets/shaders/utility/view_xform_texture.vs",
+					 "../../../assets/shaders/utility/vertex_color.fs");
 
 	// ======= VERTEX DATA AND BUFFERS ======
 	// vertex input data
@@ -113,7 +113,7 @@ int main()
 	glEnableVertexAttribArray(1);
 
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
+
 	// ----- TEXTURES ---------
 
 	// gen texture id
@@ -167,6 +167,32 @@ int main()
 		glBindTexture(GL_TEXTURE_2D, texture); // bind the texture to the GL_TEXTURE_2D target
 
 		ourShader.use();
+
+		// model / view / perspective matrices
+		glm::mat4 model = glm::mat4(1.0f); // identity matrix
+		model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+		glm::mat4 view = glm::mat4(1.0f); // identity matrix
+		// translate the scene in the reverse direction of where we want to move
+		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -2.0f));
+
+		glm::mat4 projection;
+		projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+		// FOV, aspect ratio, near plane, far plane
+
+		//send matrices to shader
+		int modelLoc = glGetUniformLocation(ourShader.ID, "model");
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+		int viewLoc = glGetUniformLocation(ourShader.ID, "view");
+		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+		
+		int projectionLoc = glGetUniformLocation(ourShader.ID, "projection");
+		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+
+
+
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		

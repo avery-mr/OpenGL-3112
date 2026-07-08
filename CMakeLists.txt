@@ -140,3 +140,8 @@ add_demo(
 	0501_texture_start
 	05_textures/01_texture_start.cpp
 )
+
+add_demo(
+	0601_coordinate_systems_start
+	06_coordinate_systems/01_coordSys_start.cpp
+)
