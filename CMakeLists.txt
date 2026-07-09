@@ -152,6 +152,11 @@ add_demo(
 )
 
 add_demo(
+	0504_texture_lerp
+	05_textures/04_texture_lerp.cpp
+)
+
+add_demo(
 	0601_coordinate_systems_start
 	06_coordinate_systems/01_coordSys_start.cpp
 )
