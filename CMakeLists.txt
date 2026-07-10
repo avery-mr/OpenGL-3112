@@ -165,3 +165,13 @@ add_demo(
 	0601_coordinate_systems_start
 	06_coordinate_systems/01_coordSys_start.cpp
 )
+
+add_demo(
+	0602_coordinate_systems_cube
+	06_coordinate_systems/02_coordSys_cube.cpp
+)
+
+add_demo(
+	0603_multiple_cubes
+	06_coordinate_systems/03_coordSys_multipleCubes.cpp
+)
