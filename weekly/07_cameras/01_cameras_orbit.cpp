@@ -33,7 +33,7 @@ int main()
 	// returns a GLFWwindow object
 
 	GLFWwindow* window =
-		glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "03 - SHADERS", nullptr, nullptr);
+		glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "0701 - Camera Orbit", nullptr, nullptr);
 
 	if (window == nullptr)
 	{
@@ -69,7 +69,7 @@ int main()
 
 	// create shader program from class
 	Shader ourShader("../../../assets/shaders/utility/view_xform_texture.vs",
-					 "../../../assets/shaders/utility/texture_simple.fs");
+		"../../../assets/shaders/utility/texture_simple.fs");
 
 	// ======= VERTEX DATA AND BUFFERS ======
 	// vertex input data
@@ -168,7 +168,7 @@ int main()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); // repeat in y direction
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // minification filter
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // magnification filter
-	
+
 	// load IMAGE with stbi and generate texture
 	int width, height, nrChannels;
 	unsigned char* data = stbi_load("../../../assets/textures/colorfulTiles.jpg", &width, &height, &nrChannels, 0);
@@ -195,13 +195,9 @@ int main()
 	// free image data after generating texture
 	stbi_image_free(data);
 
-	ourShader.use(); // activate shader program
-	
-
+	ourShader.use(); // activate shader before setting uniforms
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-	ourShader.setMat4("projection", projection); // better to set this outside the loop if it doesn't change
-
-
+	ourShader.setMat4("projection", projection);
 
 	// render loop
 	// -----------
@@ -218,19 +214,25 @@ int main()
 
 		ourShader.use();
 
-
-
 		// create transformations
-		glm::mat4 view = glm::mat4(1.0f);
-		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-		// pass transformation matrices to the shader
-		// 
+		glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+		glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+		glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
+		// right axis is the cross product of the up vector and the camera direction
+		glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+		glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
+
+		glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
+		
+		const float radius = 10.0f;
+		float camX = sin(glfwGetTime()) * radius;
+		float camz = cos(glfwGetTime()) * radius;
+
+		glm::mat4 view = glm::lookAt(glm::vec3(camX, 0.0f, camz), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		ourShader.setMat4("view", view);
 
-
-
-
 		glBindVertexArray(VAO);
+
 		for (unsigned int i = 0; i < 10; i++)
 		{
 			glm::mat4 model = glm::mat4(1.0f);
@@ -241,7 +243,7 @@ int main()
 
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
-		
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}

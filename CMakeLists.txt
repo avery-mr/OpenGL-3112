@@ -175,3 +175,13 @@ add_demo(
 	0603_multiple_cubes
 	06_coordinate_systems/03_coordSys_multipleCubes.cpp
 )
+
+add_demo(
+	0701_cameras_orbit
+	07_cameras/01_cameras_orbit.cpp
+)
+
+add_demo(
+	0702_cameras_walkAround
+	07_cameras/02_cameras_walkaround.cpp
+)

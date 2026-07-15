@@ -16,8 +16,19 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 // ESC input control
 void processInput(GLFWwindow* window);
 
+// settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
+
+// camera
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+// use delta time to make camera movement smooth and framerate independent
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+
 int main()
 {
 	std::cout << std::filesystem::current_path() << std::endl;
@@ -33,7 +44,7 @@ int main()
 	// returns a GLFWwindow object
 
 	GLFWwindow* window =
-		glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "03 - SHADERS", nullptr, nullptr);
+		glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "0701 - Camera Orbit", nullptr, nullptr);
 
 	if (window == nullptr)
 	{
@@ -69,7 +80,7 @@ int main()
 
 	// create shader program from class
 	Shader ourShader("../../../assets/shaders/utility/view_xform_texture.vs",
-					 "../../../assets/shaders/utility/texture_simple.fs");
+		"../../../assets/shaders/utility/texture_simple.fs");
 
 	// ======= VERTEX DATA AND BUFFERS ======
 	// vertex input data
@@ -168,7 +179,7 @@ int main()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); // repeat in y direction
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // minification filter
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // magnification filter
-	
+
 	// load IMAGE with stbi and generate texture
 	int width, height, nrChannels;
 	unsigned char* data = stbi_load("../../../assets/textures/colorfulTiles.jpg", &width, &height, &nrChannels, 0);
@@ -195,19 +206,20 @@ int main()
 	// free image data after generating texture
 	stbi_image_free(data);
 
-	ourShader.use(); // activate shader program
-	
-
+	ourShader.use(); // activate shader before setting uniforms
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-	ourShader.setMat4("projection", projection); // better to set this outside the loop if it doesn't change
-
-
+	ourShader.setMat4("projection", projection);
 
 	// render loop
 	// -----------
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window); // looking for specific ESC key presses
+
+		// calculate new delta time for this frame
+		float currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
 
 		// rendering commands here
 		//
@@ -218,19 +230,12 @@ int main()
 
 		ourShader.use();
 
-
-
-		// create transformations
-		glm::mat4 view = glm::mat4(1.0f);
-		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-		// pass transformation matrices to the shader
-		// 
+		// camera always looks at target direction
+		glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 		ourShader.setMat4("view", view);
 
-
-
-
 		glBindVertexArray(VAO);
+
 		for (unsigned int i = 0; i < 10; i++)
 		{
 			glm::mat4 model = glm::mat4(1.0f);
@@ -241,7 +246,7 @@ int main()
 
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
-		
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
@@ -269,4 +274,14 @@ void processInput(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
+
+	const float cameraSpeed = 2.0f * deltaTime; // adjust accordingly
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		cameraPos += cameraSpeed * cameraFront;
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		cameraPos -= cameraSpeed * cameraFront;
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 }
