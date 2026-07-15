@@ -185,3 +185,8 @@ add_demo(
 	0702_cameras_walkAround
 	07_cameras/02_cameras_walkaround.cpp
 )
+
+add_demo(
+	0703_cameras_lookaround
+	07_cameras/03_cameras_lookaround.cpp
+)
