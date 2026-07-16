@@ -190,3 +190,8 @@ add_demo(
 	0703_cameras_lookaround
 	07_cameras/03_cameras_lookaround.cpp
 )
+
+add_demo(
+	0704_Camera_Class
+	07_cameras/04_camera_class.cpp
+)
