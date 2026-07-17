@@ -195,3 +195,8 @@ add_demo(
 	0704_Camera_Class
 	07_cameras/04_camera_class.cpp
 )
+
+add_demo(
+	0705_FPS_spheres
+	07_cameras/05_FPS_spheres.cpp
+)
