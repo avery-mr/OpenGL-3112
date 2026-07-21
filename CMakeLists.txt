@@ -200,3 +200,8 @@ add_demo(
 	0705_FPS_spheres
 	07_cameras/05_FPS_spheres.cpp
 )
+
+add_demo(
+	0801_colors_start
+	08_lighting/01_colors_start.cpp
+)
