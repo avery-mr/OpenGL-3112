@@ -205,3 +205,8 @@ add_demo(
 	0801_colors_start
 	08_lighting/01_colors_start.cpp
 )
+
+add_demo(
+	0802_Basic_Lighting
+	08_lighting/02_basic_lighting.cpp
+)
